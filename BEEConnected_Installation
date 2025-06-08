@@ -1,0 +1,74 @@
+Core Device: General Purpose Computer running LINUX OS (any distribution)
+(This Instructions were tested on Raspberry Pi 4 hardware running Raspberry Pi OS ("Debian GNU/Linux 12 (bookworm)"))
+
+Hostname:			beeconnected
+IP address (host system):	192.168.2.154/24
+User Name:			beeconnected
+User Password: 			Info4Ever!
+
+
+
+1. Update OS
+>> sudo apt update
+>> cat /etc/os-release
+
+2. Install "Docker":
+	Download Docker:
+>> curl -sSL https://get.docker.com | sh
+	Add your user to the "docker" group:
+>> sudo usermod -aG docker $USER
+
+3. Preparations of Home Assistant: 
+	Create Home Asssitant config folder:
+>> sudo mkdir -p /home/pi/homeassistant
+	Set Settings for "Home Assistant" Docker Container:
+>> docker run -d \
+  --name=homeassistant \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Europe/Berlin \
+  -p 8123:8123 \
+  -v /home/pi/homeassistant:/config \
+  --restart unless-stopped \
+  linuxserver/homeassistant
+
+4. Docker Compose via .YAML file:
+	create (or copy) the "docker-compose.yml" file under the path "home/pi/homeassistant".
+>> NOTE: If there is no file, create the file yourself with the below content:
+version: "2.1"
+services:
+  homeassistant:
+    image: linuxserver/homeassistant
+    container_name: homeassistant
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - /home/pi/homeassistant:/config
+    ports:
+      - 8123:8123
+    restart: unless-stopped
+
+>> END FILE
+
+5. Start Docker Containers vie "Docker compose":
+>> sudo docker compose up -d
+
+5.2	To see the running docker containers ("homeassistant" should be listed now):
+>> sudo docker ps
+5.3	To check if home assistant is working, open the following page in your browser:
+>> http://192.168.2.154:8123
+	If everything is configuren and upand running correctly, the HomeAssistant Welcome page should open now.
+
+6. Restart the machine to take over all settings:
+>> sudo restart
+
+7. Home Assistant Setup:
+User Name: 	beeconnected
+PW. 		Info4Ever!
+
+8. Install MQTT Broker:
+
+
+9. 
